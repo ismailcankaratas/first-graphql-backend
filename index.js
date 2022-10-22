@@ -10,7 +10,7 @@ const typeDefs = `#graphql
         name:String!,
         surname:String,
         aga: Int,
-        books: [Book!]
+        books(filter: String): [Book!]
     }
     type Book {
         id:ID!
@@ -40,7 +40,13 @@ const resolvers = {
         author: (parent, args) => authors.find(author => author.id === parent.author_id),
     },
     Author: {
-        books: (parent) => books.filter(book => book.author_id === parent.id)
+        books: (parent, args) => {
+            let filtered = books.filter(book => book.author_id === parent.id)
+            if (args.filter) {
+                filtered = filtered.filter(book => book.title.toLowerCase().startsWith(args.filter.toLowerCase()));
+            }
+            return filtered;
+        }
     }
 };
 
